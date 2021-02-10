@@ -8,15 +8,11 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    message = None
-    loged_in_check = False
     connection = connect()
     cursor = connection.cursor()
     check_for_login = User.login_check(cursor)
-    if check_for_login:
-        loged_in_check = True
 
-    return render_template('index.html', loged_in_check = loged_in_check, message = message)
+    return render_template('index.html', check_for_login = check_for_login)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -24,6 +20,9 @@ def register():
     message = None
     connection = connect()
     cursor = connection.cursor()
+    check_for_login = User.login_check(cursor)
+    if check_for_login:
+        return redirect('/')
     if request.method == 'POST':
         new_user = User(request.form['username'], request.form['first_name'], request.form['last_name'], request.form['password'])
         adding_user = new_user.add_user(cursor)
@@ -31,7 +30,7 @@ def register():
             message = 'User added to data base'
     connection.close()
 
-    return render_template('register.html', message=message)
+    return render_template('register.html', message=message, check_for_login = check_for_login)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -39,6 +38,9 @@ def login():
     message = None
     connection = connect()
     cursor = connection.cursor()
+    check_for_login = User.login_check(cursor)
+    if check_for_login:
+        return redirect('/')
     if request.method == 'POST':
         login_check = User.log_in(request.form['username'], request.form['password'], cursor)
         if login_check == 'no user':
@@ -50,12 +52,43 @@ def login():
             return redirect('/')
     connection.close()
 
-    return render_template('login.html', message = message)
+    return render_template('login.html', message = message, check_for_login = check_for_login)
 
 
-@app.route('/users')
-def user():
-    return render_template('users.html')
+@app.route('/users', methods=['GET', 'POST'])
+def users():
+    connection = connect()
+    cursor = connection.cursor()
+    check_for_login = User.login_check(cursor)
+    if check_for_login:
+        loged_in_check = True
+        return render_template('users.html', check_for_login = check_for_login)
+
+    return redirect('/')
+
+
+@app.route('/messages', methods=['GET', 'POST'])
+def messages():
+    connection = connect()
+    cursor = connection.cursor()
+    check_for_login = User.login_check(cursor)
+    if check_for_login:
+        loged_in_check = True
+        return render_template('messages.html', check_for_login = check_for_login)
+
+    return redirect('/')
+
+
+@app.route('/rides', methods=['GET', 'POST'])
+def rides():
+    connection = connect()
+    cursor = connection.cursor()
+    check_for_login = User.login_check(cursor)
+    if check_for_login:
+        loged_in_check = True
+        return render_template('rides.html', check_for_login = check_for_login)
+
+    return redirect('/')
 
 
 if __name__ == '__main__':

@@ -50,7 +50,7 @@ class User(object):
         cursor.execute(sql)
         check = cursor.fetchone()
         if check:
-            return True
+            return check
 
 
     def __str__(self):
