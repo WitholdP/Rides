@@ -11,7 +11,7 @@ def index():
     connection = connect()
     cursor = connection.cursor()
     check_for_login = User.login_check(cursor)
-
+    connection.close()
     return render_template('index.html', check_for_login = check_for_login)
 
 
@@ -28,8 +28,8 @@ def register():
         adding_user = new_user.add_user(cursor)
         if adding_user == 'user_added':
             message = 'User added to data base'
-    connection.close()
 
+    connection.close()
     return render_template('register.html', message=message, check_for_login = check_for_login)
 
 
@@ -48,10 +48,10 @@ def login():
         elif login_check == 'wrong password':
             message = 'Wrong password bitch!'
         elif login_check == 'loged in':
-            message = 'You have logged in'
+            connection.close()
             return redirect('/')
-    connection.close()
 
+    connection.close()
     return render_template('login.html', message = message, check_for_login = check_for_login)
 
 
@@ -62,8 +62,10 @@ def users():
     check_for_login = User.login_check(cursor)
     if check_for_login:
         loged_in_check = True
+        connection.close()
         return render_template('users.html', check_for_login = check_for_login)
 
+    connection.close()
     return redirect('/')
 
 
@@ -74,8 +76,10 @@ def messages():
     check_for_login = User.login_check(cursor)
     if check_for_login:
         loged_in_check = True
+        connection.close()
         return render_template('messages.html', check_for_login = check_for_login)
 
+    connection.close()
     return redirect('/')
 
 
@@ -86,10 +90,34 @@ def rides():
     check_for_login = User.login_check(cursor)
     if check_for_login:
         loged_in_check = True
+        connection.close()
         return render_template('rides.html', check_for_login = check_for_login)
 
+    connection.close()
+    return redirect('/')
+
+@app.route('/logout')
+def logout():
+    connection = connect()
+    cursor = connection.cursor()
+    logging_out = User.logout(cursor)
+    if logging_out:
+        connection.close()
+        return redirect('/')
+
+@app.route('/edit', methods = ['GET', 'POST'])
+def edit():
+    connection = connect()
+    cursor = connection.cursor()
+    check_for_login = User.login_check(cursor)
+    if check_for_login:
+        get_user_detials = User.load_logedin_user(cursor)
+        connection.close()
+        return render_template('edit.html', check_for_login = check_for_login, get_user_detials = get_user_detials)
+
+    connection.close()
     return redirect('/')
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug = True)

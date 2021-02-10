@@ -21,6 +21,17 @@ class User(object):
         return False
 
     @staticmethod
+    def load_logedin_user(cursor):
+        sql = """SELECT * FROM users WHERE loged_in = True ;"""
+        cursor.execute(sql)
+        details = cursor.fetchone()
+        if details:
+            id_, username, first_name, last_name, password, loged_in = details
+            user_details = User(username, first_name, last_name)
+            user_details._id = id_
+            return user_details
+
+    @staticmethod
     def log_in(username, password, cursor):
         """Login function:
             1 - it checkes if username exists in data database
@@ -52,6 +63,8 @@ class User(object):
         if check:
             return check
 
-
-    def __str__(self):
-        return self.username
+    @staticmethod
+    def logout(cursor):
+        sql = """UPDATE users SET loged_in = False WHERE loged_in = True"""
+        cursor.execute(sql)
+        return True
