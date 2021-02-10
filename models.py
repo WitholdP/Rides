@@ -20,6 +20,38 @@ class User(object):
             return 'user_added'
         return False
 
+    @staticmethod
+    def log_in(username, password, cursor):
+        """Login function:
+            1 - it checkes if username exists in data database
+            2 - if password matches username it sets value of loged_in parameter to True, for this user"""
+
+        sql = f"""SELECT * FROM users WHERE username = '{username}' ;"""
+        cursor.execute(sql)
+        check_if_exists = cursor.fetchone()
+
+        if check_if_exists:
+            if password == check_if_exists[4]:
+                log_in_sql = f"""UPDATE users SET loged_in = True WHERE username = '{username}';"""
+                cursor.execute(log_in_sql)
+                return 'loged in'
+            else:
+                return 'wrong password'
+        else:
+            return 'no user'
+
+    @staticmethod
+    def login_check(cursor):
+        """ Function will check if any of the users has atribute loged_in set to True.
+        If yes it will change teh contect on the page. Some pages will not be available
+        for users that are not logged in."""
+
+        sql = """SELECT * FROM users WHERE loged_in = True ;"""
+        cursor.execute(sql)
+        check = cursor.fetchone()
+        if check:
+            return True
+
 
     def __str__(self):
         return self.username

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if message %}
+  <div class="alert alert-success" role="alert">
+    {{ message }}
+  </div>
+{% endif %}
+
+  <div class="container-fluid">
+        <h2 class="d-flex justify-content-center">Main Page</h2>
+  </div>
+
+
+{% endblock %}
