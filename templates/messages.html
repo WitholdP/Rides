@@ -18,7 +18,7 @@
       <div class="d-flex justify-content-center"><h3>Send message</h3></div>
       <br>
       <form class="" method="post">
-        <select class="form-select" aria-label="Default select example">
+        <select class="form-select" aria-label="Default select example" name="to_id">
           <option selected>Select reciepient</option>
           {% for user in users %}
             <option value="{{ user.0 }}">{{ user.1 }}</option>
@@ -26,7 +26,7 @@
         </select>
         <div class="mb-3">
           <label for="exampleFormControlTextarea1" class="form-label">Message</label>
-          <textarea class="form-control" id="exampleFormControlTextarea1" rows="4"></textarea>
+          <textarea class="form-control" id="exampleFormControlTextarea1" rows="4" name="message"></textarea>
         </div>
         <div class="d-flex justify-content-center">
           <button type="submit" class="btn btn-success">Send</button>
@@ -44,11 +44,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <th scope="row">User_1</th>
-          <td> Cześć frajerze </td>
-          <td>12-12-2020</td>
-        </tr>
+        {% for message in inbox %}
+          <tr>
+            <th scope="row">{{ message.0 }}</th>
+            <td> {{ message.1 }} </td>
+            <td>{{ message.2.strftime('%Y-%m-%d %H:%M') }}</td>
+          </tr>
+        {% endfor %}
       </tbody>
       </table>
     </div>
@@ -63,16 +65,17 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <th scope="row">User_1</th>
-          <td> Cześć frajerze </td>
-          <td>12-12-2020</td>
-        </tr>
+        {% for message in sent %}
+          <tr>
+            <th scope="row">{{ message.0 }}</th>
+            <td> {{ message.1 }} </td>
+            <td>{{ message.2.strftime('%Y-%m-%d %H:%M') }}</td>
+          </tr>
+        {% endfor %}
       </tbody>
       </table>
     </div>
   </div>
 </div>
-
 
 {% endblock %}

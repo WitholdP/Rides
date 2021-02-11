@@ -103,4 +103,32 @@ class Message():
         self.to_id = to_id
         self.message = message
 
-    
+    def send_message(self, cursor):
+        sql = """INSERT INTO messages (from_id, to_id, message) Values (%s, %s, %s)"""
+        values = (self.from_id, self.to_id, self.message)
+        cursor.execute(sql, values)
+        return True
+
+    @staticmethod
+    def inbox(cursor, user_id):
+        """ SQL joins the sender of the message and for filtering is user the id of loged in user"""
+
+        sql = f"""SELECT username, message, creation_date FROM messages LEFT JOIN users ON messages.from_id = users.id WHERE to_id = '{user_id}';"""
+        messages = []
+        cursor.execute(sql)
+        get_messages = cursor.fetchall()
+        for message in get_messages:
+            messages.append(message)
+        return messages
+
+
+    @staticmethod
+    def sent(cursor, user_id):
+        """reversed sql to the inbox"""
+        sql = f"""SELECT username, message, creation_date FROM messages LEFT JOIN users ON messages.to_id = users.id WHERE from_id = '{user_id}';"""
+        messages = []
+        cursor.execute(sql)
+        get_messages = cursor.fetchall()
+        for message in get_messages:
+            messages.append(message)
+        return messages

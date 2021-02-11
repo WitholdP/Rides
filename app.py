@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect
 from connection import connect
-from models import User
+from models import User, Message
 
 
 app = Flask(__name__)
@@ -71,13 +71,21 @@ def users():
 
 @app.route('/messages', methods=['GET', 'POST'])
 def messages():
+    message = None
     connection = connect()
     cursor = connection.cursor()
     check_for_login = User.login_check(cursor)
     if check_for_login:
+        inbox = Message.inbox(cursor, check_for_login[0])
+        sent = Message.sent(cursor, check_for_login[0])
         users = User.get_all_users(cursor)
+        if request.method == 'POST':
+            new_message = Message(check_for_login[0], request.form['to_id'], request.form['message'])
+            send_message = new_message.send_message(cursor)
+            if send_message:
+                message = f"Message sent!"
         connection.close()
-        return render_template('messages.html', check_for_login = check_for_login, users = users)
+        return render_template('messages.html', check_for_login = check_for_login, users = users, message = message, inbox = inbox, sent=sent)
 
     connection.close()
     return redirect('/')
